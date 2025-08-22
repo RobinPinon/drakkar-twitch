@@ -1,0 +1,22 @@
+{
+  "name": "drakkar-twitch-bot",
+  "version": "1.0.0",
+  "description": "Bot Twitch avec commande /drakkar pour faire des 50-50 entre joueurs",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "nodemon bot.js"
+  },
+  "keywords": ["twitch", "bot", "drakkar", "gaming"],
+  "author": "DrakkarBot",
+  "license": "MIT",
+  "dependencies": {
+    "tmi.js": "^1.8.5",
+    "dotenv": "^16.3.1",
+    "@twurple/api": "^7.0.0",
+    "@twurple/auth": "^7.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
