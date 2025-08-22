@@ -87,6 +87,7 @@ MAX_TIMEOUT: 900,                     // Timeout maximum (15 minutes)
 - **`!top`** - Afficher le leaderboard top 5 des meilleurs joueurs
 - **`!wr`** - Voir vos statistiques personnelles détaillées avec votre rang
 - **`!records`** - Voir les World Records globaux actuels
+- **`!help`** - Afficher la liste complète de toutes les commandes disponibles
 
 **Exemples :**
 - `!drakkar @pseudo123` - Défie l'utilisateur pseudo123
@@ -95,6 +96,7 @@ MAX_TIMEOUT: 900,                     // Timeout maximum (15 minutes)
 - `!top` - Voir le classement
 - `!wr` - Voir vos stats détaillées avec votre rang
 - `!records` - Voir les World Records globaux
+- `!help` - Voir toutes les commandes disponibles
 
 ### Déroulement d'un duel
 

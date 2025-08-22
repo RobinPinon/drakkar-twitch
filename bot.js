@@ -407,6 +407,12 @@ client.on('message', (channel, tags, message, self) => {
       }
     });
   }
+  
+  // Commande !help pour afficher toutes les commandes disponibles
+  if (messageLower.startsWith('!help')) {
+    const helpMessage = '🌟 **COMMANDES DISPONIBLES** 🌟 | ⚔️ !drakkar @utilisateur - Lancer un duel | 📊 !duels - Vérifier vos duels restants (max 5/jour) | 📈 !stats - Vos statistiques personnelles | 🏆 !top - Leaderboard top 5 | 🌟 !wr - Vos stats détaillées avec rang | 🔥 !records - World Records globaux | ❓ !help - Afficher cette liste';
+    client.say(channel, helpMessage);
+  }
 });
 
 // Gestion des commandes de modération (pour les timeouts réels)
