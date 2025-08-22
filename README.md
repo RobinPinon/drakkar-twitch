@@ -5,7 +5,7 @@ Un bot Twitch qui permet aux utilisateurs de s'affronter dans des duels 50-50 av
 ## ✨ Fonctionnalités
 
 - **Commande `!drakkar @utilisateur`** : Lance un duel entre deux joueurs
-- **Système 50-50** : Le perdant est choisi aléatoirement (sauf sopralus qui gagne toujours !)
+- **Système 50-50** : Le perdant est choisi aléatoirement (sauf sopralus et ekapsos qui gagnent toujours !)
 - **Timeout automatique** : Le perdant reçoit un timeout de 1 à 15 minutes
 - **Protection anti-spam** : Un seul duel peut être actif à la fois
 - **Limitation quotidienne** : Maximum 5 duels par jour par utilisateur
@@ -104,7 +104,7 @@ MAX_TIMEOUT: 900,                     // Timeout maximum (15 minutes)
 2. Le bot vérifie les limitations quotidiennes (max 5 duels/jour)
 3. Le bot annonce le début du duel
 4. Attente de 3 secondes pour le suspense
-5. Le vainqueur est choisi (sopralus gagne toujours, sinon 50-50)
+5. Le vainqueur est choisi (sopralus et ekapsos gagnent toujours, sinon 50-50)
 6. Le perdant reçoit un timeout de 1 à 15 minutes
 7. Mise à jour du leaderboard et vérification des WR
 8. Affichage des statistiques et records

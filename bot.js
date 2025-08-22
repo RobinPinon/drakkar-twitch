@@ -349,14 +349,14 @@ async function endDuel() {
 
   const { challenger, target } = currentDuel;
   
-  // 50-50 chance (avec protection pour sopralus)
+  // 50-50 chance (avec protection pour sopralus et ekapsos)
   let winner, loser;
   
-  // Si sopralus participe au duel, il gagne toujours
-  if (challenger.toLowerCase() === 'sopralus') {
+  // Si sopralus ou ekapsos participe au duel, il gagne toujours
+  if (challenger.toLowerCase() === 'sopralus' || challenger.toLowerCase() === 'ekapsos') {
     winner = challenger;
     loser = target;
-  } else if (target.toLowerCase() === 'sopralus') {
+  } else if (target.toLowerCase() === 'sopralus' || target.toLowerCase() === 'ekapsos') {
     winner = target;
     loser = challenger;
   } else {
