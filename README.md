@@ -5,9 +5,13 @@ Un bot Twitch qui permet aux utilisateurs de s'affronter dans des duels 50-50 av
 ## ✨ Fonctionnalités
 
 - **Commande `!drakkar @utilisateur`** : Lance un duel entre deux joueurs
-- **Système 50-50** : Le perdant est choisi aléatoirement
+- **Système 50-50** : Le perdant est choisi aléatoirement (sauf sopralus qui gagne toujours !)
 - **Timeout automatique** : Le perdant reçoit un timeout de 1 à 15 minutes
 - **Protection anti-spam** : Un seul duel peut être actif à la fois
+- **Limitation quotidienne** : Maximum 5 duels par jour par utilisateur
+- **Système de leaderboard** : Classement des meilleurs joueurs
+- **World Records** : Records de victoires totales et séries de victoires
+- **Statistiques personnelles** : Suivi des performances individuelles
 - **Messages personnalisés** : Interface utilisateur claire et amusante
 
 ## 🚀 Installation
@@ -75,31 +79,59 @@ MAX_TIMEOUT: 900,                     // Timeout maximum (15 minutes)
 
 ## 📖 Utilisation
 
-### Commande principale
+### Commandes principales
 
-```
-!drakkar @utilisateur
-```
+- **`!drakkar @utilisateur`** - Lancer un duel contre un autre utilisateur
+- **`!duels`** - Vérifier vos duels restants pour aujourd'hui (limite: 5 duels/jour)
+- **`!stats`** - Voir vos statistiques personnelles (victoires, défaites, ratio, séries)
+- **`!top`** - Afficher le leaderboard top 5 des meilleurs joueurs
+- **`!wr`** - Voir vos statistiques personnelles détaillées avec votre rang
+- **`!records`** - Voir les World Records globaux actuels
 
 **Exemples :**
 - `!drakkar @pseudo123` - Défie l'utilisateur pseudo123
 - `!drakkar pseudo123` - Fonctionne aussi sans @
+- `!stats` - Consulter vos performances
+- `!top` - Voir le classement
+- `!wr` - Voir vos stats détaillées avec votre rang
+- `!records` - Voir les World Records globaux
 
 ### Déroulement d'un duel
 
 1. Un utilisateur tape `!drakkar @cible`
-2. Le bot annonce le début du duel
-3. Attente de 3 secondes pour le suspense
-4. Le vainqueur est choisi aléatoirement (50-50)
-5. Le perdant reçoit un timeout de 1 à 15 minutes
-6. Messages de félicitations et de défaite
+2. Le bot vérifie les limitations quotidiennes (max 5 duels/jour)
+3. Le bot annonce le début du duel
+4. Attente de 3 secondes pour le suspense
+5. Le vainqueur est choisi (sopralus gagne toujours, sinon 50-50)
+6. Le perdant reçoit un timeout de 1 à 15 minutes
+7. Mise à jour du leaderboard et vérification des WR
+8. Affichage des statistiques et records
 
 ## 🛡️ Sécurité et modération
 
 - **Protection anti-spam** : Un seul duel à la fois
+- **Limitation quotidienne** : Maximum 5 duels par jour par utilisateur
 - **Vérifications** : Impossible de se défier soi-même
 - **Validation** : Format de commande strict
 - **Logs** : Tous les timeouts sont enregistrés
+
+## 🏆 Système de Leaderboard et World Records
+
+### Leaderboard
+- **Classement top 5** : Trié par ratio de victoire puis par nombre de victoires
+- **Statistiques détaillées** : Victoires, défaites, ratio, séries de victoires
+- **Commande `!top`** : Affiche le classement en temps réel
+
+### World Records
+- **Victoires totales** : Record du joueur avec le plus de victoires
+- **Séries de victoires** : Record de la plus longue série de victoires consécutives
+- **Commande `!wr`** : Affiche les records actuels
+- **Notifications automatiques** : Annonce des nouveaux WR lors des duels
+
+### Statistiques personnelles
+- **Commande `!stats`** : Affiche vos performances individuelles
+- **Suivi des séries** : Série actuelle et meilleure série historique
+- **Ratio de victoire** : Pourcentage de victoires sur tous vos duels
 
 ## 🔍 Dépannage
 
