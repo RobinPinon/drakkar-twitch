@@ -1,6 +1,8 @@
 const tmi = require('tmi.js');
 const config = require('./config');
 const TwitchAPI = require('./twitch-api');
+const fs = require('fs');
+const path = require('path');
 
 // Configuration du client TMI
 const client = new tmi.Client({
@@ -25,6 +27,86 @@ const DAY_IN_MS = 24 * 60 * 60 * 1000; // 24 heures en millisecondes
 // Système de WR et leaderboard
 const leaderboard = new Map(); // username -> { wins: number, losses: number, winStreak: number, bestWinStreak: number, totalDuels: number }
 const WR_HOLDERS = new Map(); // type -> { username: string, value: number, date: Date }
+
+// Fichiers de sauvegarde
+const DATA_DIR = './data';
+const LEADERBOARD_FILE = path.join(DATA_DIR, 'leaderboard.json');
+const WR_FILE = path.join(DATA_DIR, 'worldrecords.json');
+const DAILY_DUELS_FILE = path.join(DATA_DIR, 'dailyduels.json');
+
+// Créer le dossier data s'il n'existe pas
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// Fonction pour sauvegarder les données
+function saveData() {
+  try {
+    // Sauvegarder le leaderboard
+    const leaderboardData = Object.fromEntries(leaderboard);
+    fs.writeFileSync(LEADERBOARD_FILE, JSON.stringify(leaderboardData, null, 2));
+    
+    // Sauvegarder les World Records
+    const wrData = Object.fromEntries(WR_HOLDERS);
+    fs.writeFileSync(WR_FILE, JSON.stringify(wrData, null, 2));
+    
+    // Sauvegarder les duels quotidiens
+    const dailyDuelsData = Object.fromEntries(dailyDuels);
+    fs.writeFileSync(DAILY_DUELS_FILE, JSON.stringify(dailyDuelsData, null, 2));
+    
+    console.log('💾 Données sauvegardées avec succès');
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde:', error);
+  }
+}
+
+// Fonction pour charger les données sauvegardées
+function loadData() {
+  try {
+    // Charger le leaderboard
+    if (fs.existsSync(LEADERBOARD_FILE)) {
+      const leaderboardData = JSON.parse(fs.readFileSync(LEADERBOARD_FILE, 'utf8'));
+      Object.entries(leaderboardData).forEach(([username, data]) => {
+        // Convertir les dates string en objets Date
+        if (data.lastDuel) {
+          data.lastDuel = new Date(data.lastDuel);
+        }
+        leaderboard.set(username, data);
+      });
+      console.log(`📊 Leaderboard chargé: ${leaderboard.size} utilisateurs`);
+    }
+    
+    // Charger les World Records
+    if (fs.existsSync(WR_FILE)) {
+      const wrData = JSON.parse(fs.readFileSync(WR_FILE, 'utf8'));
+      Object.entries(wrData).forEach(([type, data]) => {
+        // Convertir les dates string en objets Date
+        if (data.date) {
+          data.date = new Date(data.date);
+        }
+        WR_HOLDERS.set(type, data);
+      });
+      console.log(`🏆 World Records chargés: ${WR_HOLDERS.size} records`);
+    }
+    
+    // Charger les duels quotidiens
+    if (fs.existsSync(DAILY_DUELS_FILE)) {
+      const dailyDuelsData = JSON.parse(fs.readFileSync(DAILY_DUELS_FILE, 'utf8'));
+      Object.entries(dailyDuelsData).forEach(([username, data]) => {
+        // Convertir les dates string en objets Date
+        if (data.lastReset) {
+          data.lastReset = new Date(data.lastReset);
+        }
+        dailyDuels.set(username, data);
+      });
+      console.log(`📅 Duels quotidiens chargés: ${dailyDuels.size} utilisateurs`);
+    }
+    
+    console.log('✅ Données chargées avec succès');
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement des données:', error);
+  }
+}
 
 // Fonction pour formater les messages avec des variables
 function formatMessage(message, variables) {
@@ -60,6 +142,10 @@ function checkDailyDuels(username) {
   // Incrémenter le compteur
   userData.count++;
   dailyDuels.set(username, userData);
+  
+  // Sauvegarder les duels quotidiens
+  saveData();
+  
   return { canDuel: true, remaining: MAX_DUELS_PER_DAY - userData.count };
 }
 
@@ -112,6 +198,9 @@ function updateLeaderboard(winner, loser) {
   
   // Vérifier les WR potentiels
   checkWorldRecords(winner, winnerData);
+  
+  // Sauvegarder automatiquement après chaque mise à jour
+  saveData();
 }
 
 // Fonction pour vérifier les World Records
@@ -410,7 +499,7 @@ client.on('message', (channel, tags, message, self) => {
   
   // Commande !help pour afficher toutes les commandes disponibles
   if (messageLower.startsWith('!help')) {
-    const helpMessage = '🌟 **COMMANDES DISPONIBLES** 🌟 | ⚔️ !drakkar @utilisateur - Lancer un duel | 📊 !duels - Vérifier vos duels restants (max 5/jour) | 📈 !stats - Vos statistiques personnelles | 🏆 !top - Leaderboard top 5 | 🌟 !wr - Vos stats détaillées avec rang | 🔥 !records - World Records globaux | ❓ !help - Afficher cette liste';
+    const helpMessage = '🌟 **COMMANDES DISPONIBLES** 🌟 | ⚔️ !drakkar @utilisateur - Lancer un duel | 📊 !duels - Vérifier vos duels restants (max 5/jour) | 📈 !stats - Vos statistiques personnelles | 🏆 !top - Leaderboard top 5 | 🔥 !records - World Records globaux | ❓ !help - Afficher cette liste';
     client.say(channel, helpMessage);
   }
 });
@@ -435,6 +524,26 @@ function connect() {
   }
 }
 
+// Sauvegarde automatique toutes les 5 minutes
+setInterval(() => {
+  saveData();
+}, 5 * 60 * 1000); // 5 minutes
+
+// Sauvegarde lors de l'arrêt du bot
+process.on('SIGINT', () => {
+  console.log('\n🔄 Arrêt du bot...');
+  saveData();
+  console.log('💾 Données sauvegardées. Au revoir ! 👋');
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n🔄 Arrêt du bot...');
+  saveData();
+  console.log('💾 Données sauvegardées. Au revoir ! 👋');
+  process.exit(0);
+});
+
 // Gestion des erreurs non capturées
 process.on('unhandledRejection', (reason, promise) => {
   console.error('❌ Promesse rejetée non gérée:', reason);
@@ -442,6 +551,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 process.on('uncaughtException', (error) => {
   console.error('❌ Exception non capturée:', error);
+  saveData(); // Sauvegarder avant de quitter
   process.exit(1);
 });
 
@@ -449,6 +559,10 @@ process.on('uncaughtException', (error) => {
 async function startBot() {
   console.log('🚀 Démarrage du Bot Drakkar...');
   console.log('📝 Assurez-vous d\'avoir configuré config.js avec vos informations Twitch');
+  
+  // Charger les données sauvegardées
+  console.log('📂 Chargement des données sauvegardées...');
+  loadData();
   
   // Tester la connexion à l'API Twitch
   console.log('🔍 Test de connexion à l\'API Twitch...');

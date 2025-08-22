@@ -5,7 +5,11 @@
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js",
-    "dev": "nodemon bot.js"
+    "dev": "nodemon bot.js",
+    "backup": "node backup.js",
+    "backup:create": "node backup.js create",
+    "backup:list": "node backup.js list",
+    "backup:restore": "node backup.js restore"
   },
   "keywords": ["twitch", "bot", "drakkar", "gaming"],
   "author": "DrakkarBot",
