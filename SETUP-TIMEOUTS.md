@@ -1,6 +1,6 @@
-# 🔧 Configuration des Timeouts - Bot Drakkar
+# 🔧 Configuration des Timeouts - Bot drakar
 
-Ce guide vous explique comment configurer les **vrais timeouts** pour votre bot Twitch Drakkar.
+Ce guide vous explique comment configurer les **vrais timeouts** pour votre bot Twitch drakar.
 
 ## ⚠️ Problème résolu
 
@@ -9,7 +9,7 @@ Ce guide vous explique comment configurer les **vrais timeouts** pour votre bot 
 
 ## 📋 Prérequis
 
-1. ✅ Compte Twitch `drakkarbot` créé
+1. ✅ Compte Twitch `drakarbot` créé
 2. ✅ Application Twitch sur [dev.twitch.tv](https://dev.twitch.tv/console)
 3. ✅ Bot connecté au chat (fonctionne déjà)
 
@@ -17,7 +17,7 @@ Ce guide vous explique comment configurer les **vrais timeouts** pour votre bot 
 
 ### 1. Récupérer le Client ID
 1. Allez sur [Twitch Developer Console](https://dev.twitch.tv/console)
-2. Sélectionnez votre application `drakkarbot`
+2. Sélectionnez votre application `drakarbot`
 3. Copiez le **Client ID** affiché
 
 ### 2. Générer un Token d'accès
@@ -38,7 +38,7 @@ TWITCH_ACCESS_TOKEN: 'votre_access_token_ici',   // Remplacez par votre token
 
 ```javascript
 module.exports = {
-  BOT_USERNAME: 'drakkarbot',
+  BOT_USERNAME: 'drakarbot',
   OAUTH_TOKEN: 'oauth:rz2l10i41ypju53eggmohdv8kfq6vx',
   CHANNEL: 'Sopralus',
   
@@ -60,7 +60,7 @@ module.exports = {
    🔍 Test de connexion à l'API Twitch...
    ✅ Connexion à l'API Twitch réussie
    ```
-3. **Testez la commande** : `!drakkar @utilisateur`
+3. **Testez la commande** : `!drakar @utilisateur`
 4. **Vérifiez le timeout** : L'utilisateur doit être vraiment timeouté
 
 ## ❌ Problèmes courants
@@ -100,4 +100,4 @@ module.exports = {
 
 ---
 
-**Une fois configuré, vos duels Drakkar appliqueront de vrais timeouts ! ⚔️⏰**
+**Une fois configuré, vos duels drakar appliqueront de vrais timeouts ! ⚔️⏰**

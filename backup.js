@@ -117,7 +117,7 @@ function restoreBackup(backupName) {
 // Fonction pour afficher l'aide
 function showHelp() {
   console.log(`
-🔄 Script de sauvegarde et restauration du Bot Drakkar
+🔄 Script de sauvegarde et restauration du Bot drakar
 
 Usage:
   node backup.js [commande] [option]

@@ -1,14 +1,14 @@
-# 🤖 Bot Twitch Drakkar
+# 🤖 Bot Twitch drakar
 
-Un bot Twitch qui permet aux utilisateurs de s'affronter dans des duels 50-50 avec la commande `!drakkar`.
+Un bot Twitch qui permet aux utilisateurs de s'affronter dans des duels 50-50 avec la commande `!drakar`.
 
 ## ✨ Fonctionnalités
 
-- **Commande `!drakkar @utilisateur`** : Lance un duel entre deux joueurs
+- **Commande `!drakar @utilisateur`** : Lance un duel entre deux joueurs
 - **Système 50-50** : Le perdant est choisi aléatoirement (sauf sopralus et ekapsos qui gagnent toujours !)
 - **Timeout automatique** : Le perdant reçoit un timeout de 1 à 15 minutes
 - **Protection anti-spam** : Un seul duel peut être actif à la fois
-- **Limitation quotidienne** : Maximum 5 duels par jour par utilisateur
+- **Limitation quotidienne** : Maximum 5 duels par jour par utilisateur (en tant qu'attaquant)
 - **Système de leaderboard** : Classement des meilleurs joueurs
 - **World Records** : Records de victoires totales et séries de victoires
 - **Statistiques personnelles** : Suivi des performances individuelles
@@ -27,7 +27,7 @@ Un bot Twitch qui permet aux utilisateurs de s'affronter dans des duels 50-50 av
 1. **Cloner le projet**
    ```bash
    git clone <votre-repo>
-   cd drakkar-twitch
+   cd drakar-twitch
    ```
 
 2. **Installer les dépendances**
@@ -68,7 +68,7 @@ Un bot Twitch qui permet aux utilisateurs de s'affronter dans des duels 50-50 av
 
 ```javascript
 // Dans config.js
-BOT_USERNAME: 'drakkarbot',           // Nom d'utilisateur du bot
+BOT_USERNAME: 'drakarbot',           // Nom d'utilisateur du bot
 OAUTH_TOKEN: 'oauth:token_ici',       // Token OAuth pour le chat
 CHANNEL: 'votre_chaine',              // Nom de votre chaîne
 TWITCH_CLIENT_ID: 'client_id_ici',    // ID de votre application Twitch
@@ -81,8 +81,8 @@ MAX_TIMEOUT: 900,                     // Timeout maximum (15 minutes)
 
 ### Commandes principales
 
-- **`!drakkar @utilisateur`** - Lancer un duel contre un autre utilisateur
-- **`!duels`** - Vérifier vos duels restants pour aujourd'hui (limite: 5 duels/jour)
+- **`!drakar @utilisateur`** - Lancer un duel contre un autre utilisateur
+- **`!duels`** - Vérifier vos duels restants pour aujourd'hui (limite: 5 duels/jour en tant qu'attaquant)
 - **`!stats`** - Voir vos statistiques personnelles (victoires, défaites, ratio, séries)
 - **`!top`** - Afficher le leaderboard top 5 des meilleurs joueurs
 - **`!wr`** - Voir vos statistiques personnelles détaillées avec votre rang
@@ -90,8 +90,8 @@ MAX_TIMEOUT: 900,                     // Timeout maximum (15 minutes)
 - **`!help`** - Afficher la liste complète de toutes les commandes disponibles
 
 **Exemples :**
-- `!drakkar @pseudo123` - Défie l'utilisateur pseudo123
-- `!drakkar pseudo123` - Fonctionne aussi sans @
+- `!drakar @pseudo123` - Défie l'utilisateur pseudo123
+- `!drakar pseudo123` - Fonctionne aussi sans @
 - `!stats` - Consulter vos performances
 - `!top` - Voir le classement
 - `!wr` - Voir vos stats détaillées avec votre rang
@@ -100,8 +100,8 @@ MAX_TIMEOUT: 900,                     // Timeout maximum (15 minutes)
 
 ### Déroulement d'un duel
 
-1. Un utilisateur tape `!drakkar @cible`
-2. Le bot vérifie les limitations quotidiennes (max 5 duels/jour)
+1. Un utilisateur tape `!drakar @cible`
+2. Le bot vérifie les limitations quotidiennes (max 5 duels/jour pour l'attaquant)
 3. Le bot annonce le début du duel
 4. Attente de 3 secondes pour le suspense
 5. Le vainqueur est choisi (sopralus et ekapsos gagnent toujours, sinon 50-50)
@@ -112,7 +112,7 @@ MAX_TIMEOUT: 900,                     // Timeout maximum (15 minutes)
 ## 🛡️ Sécurité et modération
 
 - **Protection anti-spam** : Un seul duel à la fois
-- **Limitation quotidienne** : Maximum 5 duels par jour par utilisateur
+- **Limitation quotidienne** : Maximum 5 duels par jour par utilisateur (en tant qu'attaquant)
 - **Vérifications** : Impossible de se défier soi-même
 - **Validation** : Format de commande strict
 - **Logs** : Tous les timeouts sont enregistrés
@@ -203,4 +203,7 @@ Si vous rencontrez des problèmes :
 
 ---
 
-**Bon streaming avec votre Bot Drakkar ! ⚔️**
+**Bon streaming avec votre Bot drakar ! ⚔️**
+
+TODO :
+MEME SI DUEL UTILISE LA PERSONNE FOCUS

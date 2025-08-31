@@ -1,4 +1,4 @@
-# 💾 Système de Sauvegarde Automatique - Bot Drakkar
+# 💾 Système de Sauvegarde Automatique - Bot drakar
 
 ## 🎯 **Objectif**
 
@@ -17,7 +17,7 @@ Ce système permet de **conserver l'historique complet** de votre bot Twitch ent
 
 ### **Où ?**
 ```
-drakkar-twitch/
+drakar-twitch/
 ├── data/                    # Données actuelles
 │   ├── leaderboard.json    # Leaderboard
 │   ├── worldrecords.json   # World Records

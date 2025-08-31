@@ -51,7 +51,7 @@ class TwitchAPI {
   }
 
   // Appliquer un timeout à un utilisateur (pas un ban permanent)
-  async timeoutUser(username, duration, reason = 'Duel Drakkar - Défaite') {
+  async timeoutUser(username, duration, reason = 'Duel drakar - Défaite') {
     try {
       const [userInfo, moderatorId, broadcasterId] = await Promise.all([
         this.apiClient.users.getUserByName(username),

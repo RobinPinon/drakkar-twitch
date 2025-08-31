@@ -310,7 +310,7 @@ function startDuel(challenger, target) {
     return;
   }
 
-  // Vérifier les limitations quotidiennes pour le challenger
+  // Vérifier les limitations quotidiennes UNIQUEMENT pour l'attaquant (challenger)
   const challengerLimits = checkDailyDuels(challenger);
   if (!challengerLimits.canDuel) {
     const userData = dailyDuels.get(challenger);
@@ -319,14 +319,7 @@ function startDuel(challenger, target) {
     return;
   }
 
-  // Vérifier les limitations quotidiennes pour la cible
-  const targetLimits = checkDailyDuels(target);
-  if (!targetLimits.canDuel) {
-    const userData = dailyDuels.get(target);
-    const timeUntilReset = getTimeUntilReset(userData.lastReset);
-    client.say(config.CHANNEL, `⏰ @${target} a atteint sa limite de ${MAX_DUELS_PER_DAY} duels par jour. Reset dans ${timeUntilReset}.`);
-    return;
-  }
+  // La cible n'a pas de limitation quotidienne - elle peut être attaquée autant de fois que voulu
 
   isDuelActive = true;
   currentDuel = { challenger, target, startTime: Date.now() };
@@ -388,7 +381,7 @@ async function endDuel() {
 
   // Appliquer le vrai timeout via l'API Twitch
   const timeoutSeconds = timeoutMinutes * 60;
-  const timeoutSuccess = await twitchAPI.timeoutUser(loser, timeoutSeconds, 'Duel Drakkar - Défaite');
+  const timeoutSuccess = await twitchAPI.timeoutUser(loser, timeoutSeconds, 'Duel drakar - Défaite');
   
   if (timeoutSuccess) {
     console.log(`✅ Timeout de ${loser} appliqué pour ${timeoutMinutes} minutes`);
@@ -421,8 +414,8 @@ client.on('message', (channel, tags, message, self) => {
   const username = tags.username;
   const messageLower = message.toLowerCase();
 
-  // Commande !drakkar
-  if (messageLower.startsWith('!drakkar')) {
+  // Commande !drakar
+  if (messageLower.startsWith('!drakar')) {
     const args = message.split(' ');
     
     if (args.length !== 2) {
@@ -456,10 +449,10 @@ client.on('message', (channel, tags, message, self) => {
   if (messageLower.startsWith('!duels')) {
     const userData = dailyDuels.get(username);
     if (!userData) {
-      client.say(channel, `📊 @${username}, vous n'avez pas encore participé à de duel aujourd'hui. Limite: ${MAX_DUELS_PER_DAY} duels par jour.`);
+      client.say(channel, `📊 @${username}, vous n'avez pas encore lancé de duel aujourd'hui. Limite: ${MAX_DUELS_PER_DAY} duels par jour (en tant qu'attaquant).`);
     } else {
       const timeUntilReset = getTimeUntilReset(userData.lastReset);
-      client.say(channel, `📊 @${username}, vous avez utilisé ${userData.count}/${MAX_DUELS_PER_DAY} duels aujourd'hui. Reset dans ${timeUntilReset}.`);
+      client.say(channel, `📊 @${username}, vous avez lancé ${userData.count}/${MAX_DUELS_PER_DAY} duels aujourd'hui. Reset dans ${timeUntilReset}.`);
     }
   }
   
@@ -499,7 +492,7 @@ client.on('message', (channel, tags, message, self) => {
   
   // Commande !help pour afficher toutes les commandes disponibles
   if (messageLower.startsWith('!help')) {
-    const helpMessage = '🌟 **COMMANDES DISPONIBLES** 🌟 | ⚔️ !drakkar @utilisateur - Lancer un duel | 📊 !duels - Vérifier vos duels restants (max 5/jour) | 📈 !stats - Vos statistiques personnelles | 🏆 !top - Leaderboard top 5 | 🔥 !records - World Records globaux | ❓ !help - Afficher cette liste';
+    const helpMessage = '🌟 **COMMANDES DISPONIBLES** 🌟 | ⚔️ !drakar @utilisateur - Lancer un duel | 📊 !duels - Vérifier vos duels restants (max 5/jour en tant qu\'attaquant) | 📈 !stats - Vos statistiques personnelles | 🏆 !top - Leaderboard top 5 | 🔥 !records - World Records globaux | ❓ !help - Afficher cette liste';
     client.say(channel, helpMessage);
   }
 });
@@ -557,7 +550,7 @@ process.on('uncaughtException', (error) => {
 
 // Démarrer le bot
 async function startBot() {
-  console.log('🚀 Démarrage du Bot Drakkar...');
+  console.log('🚀 Démarrage du Bot drakar...');
   console.log('📝 Assurez-vous d\'avoir configuré config.js avec vos informations Twitch');
   
   // Charger les données sauvegardées
@@ -579,7 +572,7 @@ async function startBot() {
       console.log('✅ Bot modérateur - Les timeouts fonctionneront !');
     } else {
       console.log('⚠️ Bot non modérateur - Les timeouts ne fonctionneront pas');
-      console.log('💡 Ajoutez drakkarbot comme modérateur sur votre chaîne');
+      console.log('💡 Ajoutez drakarbot comme modérateur sur votre chaîne');
     }
     
     // Obtenir les infos de la chaîne

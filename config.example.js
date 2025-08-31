@@ -1,7 +1,7 @@
-// Configuration du Bot Twitch Drakkar - EXEMPLE
+// Configuration du Bot Twitch drakar - EXEMPLE
 module.exports = {
   // Remplacez ces valeurs par vos informations
-  BOT_USERNAME: 'drakkarbot',
+  BOT_USERNAME: 'drakarbot',
   OAUTH_TOKEN: 'votre_token_oauth_ici', // Remplacez par votre token OAuth
   CHANNEL: 'VotreChaîne', // Remplacez par le nom de votre chaîne
   
@@ -15,11 +15,11 @@ module.exports = {
   
   // Messages du bot
   MESSAGES: {
-    COMMAND_USAGE: 'Usage: !drakkar @utilisateur',
-    INVALID_TARGET: 'Cible invalide. Utilisez: !drakkar @utilisateur',
+    COMMAND_USAGE: 'Usage: !drakar @utilisateur',
+    INVALID_TARGET: 'Cible invalide. Utilisez: !drakar @utilisateur',
     SELF_TARGET: 'Vous ne pouvez pas vous défier vous-même !',
     TARGET_NOT_FOUND: 'Utilisateur non trouvé dans le chat.',
-    DUEL_START: '⚔️ Duel Drakkar lancé ! @{challenger} vs @{target}',
+    DUEL_START: '⚔️ Duel drakar lancé ! @{challenger} vs @{target}',
     DUEL_WINNER: '🏆 @{winner} remporte le duel !',
     DUEL_LOSER: '💀 @{loser} perd et prend un timeout de {timeout} minutes !',
     ALREADY_IN_DUEL: 'Un duel est déjà en cours ! Attendez qu\'il se termine.',
