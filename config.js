@@ -1,13 +1,15 @@
-// Configuration du Bot Twitch drakar
+// Configuration du Bot Twitch Drakkar
+require('dotenv').config();
+
 module.exports = {
-  // Remplacez ces valeurs par vos informations
-  BOT_USERNAME: 'drakarbot',
-  OAUTH_TOKEN: 'xiiwla1vm55m3wlc8m63z3fa2aknsk', // Remplacez par votre token OAuth
-  CHANNEL: 'Sopralus', // Remplacez par le nom de votre chaîne
+  // Configuration de base
+  BOT_USERNAME: 'drakkarbot',
+  OAUTH_TOKEN: process.env.OAUTH_TOKEN || 'oauth:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  CHANNEL: 'Sopralus',
   
-  // Configuration API Twitch (pour les timeouts)
-  TWITCH_CLIENT_ID: 'gou2n3f8ufocqls0fd4gc89u8i4w55', // ID de votre application Twitch
-  TWITCH_ACCESS_TOKEN: 'Bearer xiiwla1vm55m3wlc8m63z3fa2aknsk', // Token d'accès pour l'API (commence par 'Bearer')
+  // Configuration API Twitch (pour les timeouts et abonnements)
+  TWITCH_CLIENT_ID: process.env.TWITCH_CLIENT_ID || 'gou2n3f8ufocqls0fd4gc89u8i4w55',
+  TWITCH_ACCESS_TOKEN: process.env.TWITCH_ACCESS_TOKEN || 'Bearer xiiwla1vm55m3wlc8m63z3fa2aknsk',
   
   // Configuration des timeouts (en secondes)
   MIN_TIMEOUT: 60,   // 1 minute

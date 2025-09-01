@@ -129,6 +129,40 @@ class TwitchAPI {
       return false;
     }
   }
+
+  // Vérifier si un utilisateur est abonné à la chaîne
+  async isSubscriber(username) {
+    try {
+      const broadcasterId = await this.getBroadcasterId();
+      const userId = await this.getUserId(username);
+      
+      if (!broadcasterId || !userId) {
+        console.log(`⚠️ Impossible de récupérer les IDs pour ${username}: broadcasterId=${broadcasterId}, userId=${userId}`);
+        return false;
+      }
+
+      console.log(`🔍 Vérification de l'abonnement de ${username}...`);
+      
+      // Vérifier l'abonnement
+      const subscription = await this.apiClient.subscriptions.getSubscriptionForUser(
+        broadcasterId,
+        userId
+      );
+      
+      const isSub = subscription !== null;
+      console.log(`📊 ${username} est ${isSub ? 'ABONNÉ' : 'NON ABONNÉ'}`);
+      return isSub;
+    } catch (error) {
+      // Si l'erreur est 404, l'utilisateur n'est pas abonné
+      if (error.status === 404) {
+        console.log(`📊 ${username} n'est pas abonné (404)`);
+        return false;
+      }
+      console.error(`❌ Erreur lors de la vérification de l'abonnement de ${username}:`, error.message);
+      console.error(`❌ Status: ${error.status}, Code: ${error.code}`);
+      return false;
+    }
+  }
 }
 
 module.exports = TwitchAPI;

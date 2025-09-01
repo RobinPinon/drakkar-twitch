@@ -20,8 +20,9 @@ let currentDuel = null;
 const twitchAPI = new TwitchAPI();
 
 // Système de limitation des duels par jour
-const dailyDuels = new Map(); // username -> { count: number, lastReset: Date }
-const MAX_DUELS_PER_DAY = 5; // Augmenté à 5 duels par jour
+const dailyDuels = new Map(); // username -> { count: number, lastReset: Date, isSubscriber: boolean }
+const MAX_DUELS_PER_DAY = 5; // Duels de base par jour
+const SUBSCRIBER_BONUS = 5; // Bonus de +5 duels pour les abonnés
 const DAY_IN_MS = 24 * 60 * 60 * 1000; // 24 heures en millisecondes
 
 // Système de WR et leaderboard
@@ -89,18 +90,22 @@ function loadData() {
       console.log(`🏆 World Records chargés: ${WR_HOLDERS.size} records`);
     }
     
-    // Charger les duels quotidiens
-    if (fs.existsSync(DAILY_DUELS_FILE)) {
-      const dailyDuelsData = JSON.parse(fs.readFileSync(DAILY_DUELS_FILE, 'utf8'));
-      Object.entries(dailyDuelsData).forEach(([username, data]) => {
-        // Convertir les dates string en objets Date
-        if (data.lastReset) {
-          data.lastReset = new Date(data.lastReset);
-        }
-        dailyDuels.set(username, data);
-      });
-      console.log(`📅 Duels quotidiens chargés: ${dailyDuels.size} utilisateurs`);
-    }
+          // Charger les duels quotidiens
+      if (fs.existsSync(DAILY_DUELS_FILE)) {
+        const dailyDuelsData = JSON.parse(fs.readFileSync(DAILY_DUELS_FILE, 'utf8'));
+        Object.entries(dailyDuelsData).forEach(([username, data]) => {
+          // Convertir les dates string en objets Date
+          if (data.lastReset) {
+            data.lastReset = new Date(data.lastReset);
+          }
+          // Ajouter le statut abonné s'il n'existe pas (pour la compatibilité)
+          if (data.isSubscriber === undefined) {
+            data.isSubscriber = false;
+          }
+          dailyDuels.set(username, data);
+        });
+        console.log(`📅 Duels quotidiens chargés: ${dailyDuels.size} utilisateurs`);
+      }
     
     console.log('✅ Données chargées avec succès');
   } catch (error) {
@@ -116,37 +121,55 @@ function formatMessage(message, variables) {
 }
 
 // Fonction pour vérifier et mettre à jour les duels quotidiens
-function checkDailyDuels(username) {
+async function checkDailyDuels(username) {
   const now = new Date();
   const userData = dailyDuels.get(username);
   
-  // Si c'est le premier duel de l'utilisateur
-  if (!userData) {
-    dailyDuels.set(username, { count: 1, lastReset: now });
-    return { canDuel: true, remaining: MAX_DUELS_PER_DAY - 1 };
+  // Vérifier le statut abonné (mise à jour quotidienne)
+  let isSubscriber = false;
+  try {
+    isSubscriber = await twitchAPI.isSubscriber(username);
+  } catch (error) {
+    console.log(`⚠️ Impossible de vérifier le statut abonné de ${username}:`, error.message);
+    // Utiliser l'ancien statut si disponible
+    if (userData) {
+      isSubscriber = userData.isSubscriber || false;
+    }
   }
   
-  // Vérifier si c'est un nouveau jour
+  // Calculer la limite totale (base + bonus abonné)
+  const totalLimit = MAX_DUELS_PER_DAY + (isSubscriber ? SUBSCRIBER_BONUS : 0);
+  
+  // Si c'est le premier duel de l'utilisateur
+  if (!userData) {
+    dailyDuels.set(username, { count: 1, lastReset: now, isSubscriber });
+    return { canDuel: true, remaining: totalLimit - 1, isSubscriber, totalLimit };
+  }
+  
+  // Vérifier si c'est un nouveau jour ou si le statut abonné a changé
   const timeSinceReset = now - userData.lastReset;
-  if (timeSinceReset >= DAY_IN_MS) {
-    // Nouveau jour, reset du compteur
-    dailyDuels.set(username, { count: 1, lastReset: now });
-    return { canDuel: true, remaining: MAX_DUELS_PER_DAY - 1 };
+  const statusChanged = userData.isSubscriber !== isSubscriber;
+  
+  if (timeSinceReset >= DAY_IN_MS || statusChanged) {
+    // Nouveau jour ou changement de statut, reset du compteur
+    dailyDuels.set(username, { count: 1, lastReset: now, isSubscriber });
+    return { canDuel: true, remaining: totalLimit - 1, isSubscriber, totalLimit };
   }
   
   // Même jour, vérifier la limite
-  if (userData.count >= MAX_DUELS_PER_DAY) {
-    return { canDuel: false, remaining: 0 };
+  if (userData.count >= totalLimit) {
+    return { canDuel: false, remaining: 0, isSubscriber, totalLimit };
   }
   
   // Incrémenter le compteur
   userData.count++;
+  userData.isSubscriber = isSubscriber; // Mettre à jour le statut
   dailyDuels.set(username, userData);
   
   // Sauvegarder les duels quotidiens
   saveData();
   
-  return { canDuel: true, remaining: MAX_DUELS_PER_DAY - userData.count };
+  return { canDuel: true, remaining: totalLimit - userData.count, isSubscriber, totalLimit };
 }
 
 // Fonction pour obtenir le temps restant avant reset
@@ -304,18 +327,19 @@ function getRandomTimeout() {
 }
 
 // Fonction pour démarrer un duel
-function startDuel(challenger, target) {
+async function startDuel(challenger, target) {
   if (isDuelActive) {
     client.say(config.CHANNEL, config.MESSAGES.ALREADY_IN_DUEL);
     return;
   }
 
   // Vérifier les limitations quotidiennes UNIQUEMENT pour l'attaquant (challenger)
-  const challengerLimits = checkDailyDuels(challenger);
+  const challengerLimits = await checkDailyDuels(challenger);
   if (!challengerLimits.canDuel) {
     const userData = dailyDuels.get(challenger);
     const timeUntilReset = getTimeUntilReset(userData.lastReset);
-    client.say(config.CHANNEL, `⏰ @${challenger}, vous avez atteint votre limite de ${MAX_DUELS_PER_DAY} duels par jour. Reset dans ${timeUntilReset}.`);
+    const subscriberText = challengerLimits.isSubscriber ? ' (Abonné: +5 duels)' : '';
+    client.say(config.CHANNEL, `⏰ @${challenger}, vous avez atteint votre limite de ${challengerLimits.totalLimit} duels par jour${subscriberText}. Reset dans ${timeUntilReset}.`);
     return;
   }
 
@@ -407,7 +431,7 @@ client.on('disconnected', (reason) => {
 });
 
 // Gestion des messages du chat
-client.on('message', (channel, tags, message, self) => {
+client.on('message', async (channel, tags, message, self) => {
   // Ignorer les messages du bot
   if (self) return;
 
@@ -449,10 +473,21 @@ client.on('message', (channel, tags, message, self) => {
   if (messageLower.startsWith('!duels')) {
     const userData = dailyDuels.get(username);
     if (!userData) {
-      client.say(channel, `📊 @${username}, vous n'avez pas encore lancé de duel aujourd'hui. Limite: ${MAX_DUELS_PER_DAY} duels par jour (en tant qu'attaquant).`);
+      // Vérifier le statut abonné en temps réel
+      try {
+        const isSubscriber = await twitchAPI.isSubscriber(username);
+        const totalLimit = MAX_DUELS_PER_DAY + (isSubscriber ? SUBSCRIBER_BONUS : 0);
+        const subscriberText = isSubscriber ? ' (Abonné: +5 duels)' : '';
+        client.say(channel, `📊 @${username}, vous n'avez pas encore lancé de duel aujourd'hui. Limite: ${totalLimit} duels par jour${subscriberText}.`);
+      } catch (error) {
+        // Fallback si l'API échoue
+        client.say(channel, `📊 @${username}, vous n'avez pas encore lancé de duel aujourd'hui. Limite: ${MAX_DUELS_PER_DAY} duels par jour.`);
+      }
     } else {
       const timeUntilReset = getTimeUntilReset(userData.lastReset);
-      client.say(channel, `📊 @${username}, vous avez lancé ${userData.count}/${MAX_DUELS_PER_DAY} duels aujourd'hui. Reset dans ${timeUntilReset}.`);
+      const totalLimit = MAX_DUELS_PER_DAY + (userData.isSubscriber ? SUBSCRIBER_BONUS : 0);
+      const subscriberText = userData.isSubscriber ? ' (Abonné: +5 duels)' : '';
+      client.say(channel, `📊 @${username}, vous avez lancé ${userData.count}/${totalLimit} duels aujourd'hui${subscriberText}. Reset dans ${timeUntilReset}.`);
     }
   }
   
@@ -492,7 +527,7 @@ client.on('message', (channel, tags, message, self) => {
   
   // Commande !help pour afficher toutes les commandes disponibles
   if (messageLower.startsWith('!help')) {
-    const helpMessage = '🌟 **COMMANDES DISPONIBLES** 🌟 | ⚔️ !drakar @utilisateur - Lancer un duel | 📊 !duels - Vérifier vos duels restants (max 5/jour en tant qu\'attaquant) | 📈 !stats - Vos statistiques personnelles | 🏆 !top - Leaderboard top 5 | 🔥 !records - World Records globaux | ❓ !help - Afficher cette liste';
+    const helpMessage = '🌟 **COMMANDES DISPONIBLES** 🌟 | ⚔️ !drakar @utilisateur - Lancer un duel | 📊 !duels - Vérifier vos duels restants (5/jour +5 si abonné) | 📈 !stats - Vos statistiques personnelles | 🏆 !top - Leaderboard top 5 | 🔥 !records - World Records globaux | ❓ !help - Afficher cette liste';
     client.say(channel, helpMessage);
   }
 });
